@@ -1,12 +1,19 @@
 #include <functional>
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/server.hpp>
+#include <iostream>
+#include <boost/beast/core.hpp>
+#include <boost/beast/websocket.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <thread>
+#include <vector>
+
+namespace beast = boost::beast;         // from <boost/beast.hpp>
+namespace http = beast::http;           // from <boost/beast/http.hpp>
+namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
+namespace net = boost::asio;            // from <boost/asio.hpp>
+using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
 #ifndef WEBSOCKETSERVER_H
 #define WEBSOCKETSERVER_H
-
-typedef websocketpp::server<websocketpp::config::asio> server;
-typedef server::message_ptr message_ptr;
 
 class WebSocketServer
 {
@@ -15,15 +22,15 @@ public:
 
   void run();
   void sendMessage(const std::string &message);
+  void waitForFrontendMessageOnPause();
 private:
   void startListening();
-  void printListeningNotification();
-  void onMessage(websocketpp::connection_hdl hdl, const message_ptr& msg);
+  void printListeningMessage();
+  void waitFrontendMessage();
 
   int port_;
   std::function<void(std::string)> onMessage_;
-  std::unique_ptr<server> server_ = nullptr;
-  websocketpp::connection_hdl hdl_;
+  std::unique_ptr<websocket::stream<tcp::socket>> ws_ = nullptr;
 };
 
 #endif // WEBSOCKETSERVER_H

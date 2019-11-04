@@ -23,7 +23,7 @@ static inline v8_inspector::StringView convertToStringView(const std::string &st
 }
 
 static inline v8::Local<v8::Object> parseJson(const v8::Local<v8::Context> &context, const std::string &json) {
-    v8::MaybeLocal<v8::Value> value_ = v8::JSON::Parse(context, v8::String::NewFromUtf8(context->GetIsolate(), json.c_str(), v8::NewStringType::kNormal).ToLocalChecked());
+    v8::MaybeLocal<v8::Value> value_ = v8::JSON::Parse(context, v8::String::NewFromUtf8(context->GetIsolate(), &json[0], v8::NewStringType::kNormal).ToLocalChecked());
     if (value_.IsEmpty()) {
         return v8::Local<v8::Object>();
     }

@@ -1,22 +1,25 @@
-#include <iostream>
-#include <functional>
 #include "Inspector.h"
-#include "utils.h"
 
 Inspector::Inspector(const std::unique_ptr<v8::Platform> &platform, const v8::Local<v8::Context> &context, const int webSocketPort) {
     context_ = context;
     websocket_server_ = std::unique_ptr<WebSocketServer>(new WebSocketServer(webSocketPort, std::bind(&Inspector::onMessage, this, std::placeholders::_1)));
-    inspector_client_ = std::unique_ptr<V8InspectorClientImpl>(new V8InspectorClientImpl(platform, context_, std::bind(&Inspector::sendMessage, this, std::placeholders::_1)));
+    inspector_client_ = std::unique_ptr<V8InspectorClientImpl>(new V8InspectorClientImpl(platform, context_, std::bind(&Inspector::sendMessage, this, std::placeholders::_1), std::bind(
+            &Inspector::waitForFrontendMessage, this)));
 }
 
 void Inspector::onMessage(const std::string& message) {
     std::cout << "CDT message: " << message << std::endl;
     v8_inspector::StringView protocolMessage = convertToStringView(message);
     inspector_client_->dispatchProtocolMessage(protocolMessage);
+
     v8::Local<v8::Object> jsonObject = parseJson(context_, message);
     if (!jsonObject.IsEmpty()) {
         std::string method = getPropertyFromJson(context_->GetIsolate(), jsonObject, "method");
-        std::cout << "Method: " << method << std::endl;
+        if (method == "Runtime.runIfWaitingForDebugger") {
+            inspector_client_->schedulePauseOnNextStatement(convertToStringView("For testing purpose!"));
+            inspector_client_->waitFrontendMessageOnPause();
+            executeScripts();
+        }
     }
 }
 
@@ -30,30 +33,7 @@ void Inspector::startAgent() {
 }
 
 void Inspector::addFileForInspection(const std::string &filePath) {
-    std::string fileContent = readFileContent(filePath);
-
-    if (fileContent.length() == 0) {
-        exit(1);
-    }
-    const auto isolate_ = context_->GetIsolate();
-    v8::Local<v8::Script> script;
-    v8::TryCatch tryCatch(isolate_);
-    v8::Local<v8::String> source = v8::String::NewFromUtf8(
-        isolate_,
-        fileContent.c_str(),
-        v8::NewStringType::kNormal
-    ).ToLocalChecked();
-
-    if (!compileScript(source, filePath, script, tryCatch)) {
-        std::cerr << "could not compile the script" << std::endl;
-        std::cerr << "Exception: " << getExceptionMessage(isolate_, tryCatch.Exception()) << std::endl;
-        exit(1);
-    }
-    if (!executeScript(script, tryCatch)) {
-        std::cerr << "could not execute the script" << std::endl;
-        std::cerr << "Exception: " << getExceptionMessage(isolate_, tryCatch.Exception()) << std::endl;
-        exit(1);
-    }
+    scripts.emplace_back(filePath);
 }
 
 bool Inspector::compileScript(const v8::Local<v8::String> &source, const std::string &filePath, v8::Local<v8::Script> &script, const v8::TryCatch &tryCatch) {
@@ -75,4 +55,35 @@ bool Inspector::compileScript(const v8::Local<v8::String> &source, const std::st
 bool Inspector::executeScript(const v8::Local<v8::Script> &script, const v8::TryCatch &tryCatch) {
     script->Run(context_);
     return !tryCatch.HasCaught();
+}
+
+void Inspector::executeScripts() {
+    for(const std::string &filePath : scripts) {
+        std::string fileContent = readFileContent(filePath);
+
+        const auto isolate_ = context_->GetIsolate();
+        v8::Local<v8::Script> script;
+        v8::TryCatch tryCatch(isolate_);
+        v8::Local<v8::String> source = v8::String::NewFromUtf8(
+                isolate_,
+                fileContent.c_str(),
+                v8::NewStringType::kNormal
+        ).ToLocalChecked();
+
+        if (!compileScript(source, filePath, script, tryCatch)) {
+            std::cerr << "could not compile the script" << std::endl;
+            std::cerr << "Exception: " << getExceptionMessage(isolate_, tryCatch.Exception()) << std::endl;
+            exit(1);
+        }
+        if (!executeScript(script, tryCatch)) {
+            std::cerr << "could not execute the script" << std::endl;
+            std::cerr << "Exception: " << getExceptionMessage(isolate_, tryCatch.Exception()) << std::endl;
+            exit(1);
+        }
+    }
+}
+
+int Inspector::waitForFrontendMessage() {
+    websocket_server_->waitForFrontendMessageOnPause();
+    return 1;
 }
