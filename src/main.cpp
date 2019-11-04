@@ -18,12 +18,25 @@ int main()
     create_params.array_buffer_allocator =
             v8::ArrayBuffer::Allocator::NewDefaultAllocator();
     v8::Isolate* isolate = v8::Isolate::New(create_params);
-    v8::Isolate::Scope isolate_scope(isolate);
-    v8::HandleScope scope(isolate);
-    v8::Handle<v8::Context> context = v8::Context::New(isolate);
+    {
+        v8::Isolate::Scope isolate_scope(isolate);
+        v8::HandleScope scope(isolate);
+        v8::Handle<v8::Context> context = v8::Context::New(isolate);
+        v8::Context::Scope context_scope(context);
 
-    inspector = std::unique_ptr<Inspector>(new Inspector(context, port));
-    inspector->startAgent();
+        inspector = std::unique_ptr<Inspector>(new Inspector(v8Platform, context, port));
+
+        // absolute or relative path of JavaScript source file to the executable
+        // V8 Inspector is very powerful, it has the source map support! You can debug your TypeScript code directly on ChromeDevTools!
+        inspector->addFileForInspection("../example/code.ts");
+
+        inspector->startAgent();
+    }
+
+    isolate->Dispose();
+    v8::V8::Dispose();
+    v8::V8::ShutdownPlatform();
+    delete create_params.array_buffer_allocator;
 
     return 0;
 }
