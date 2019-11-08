@@ -1,0 +1,28 @@
+name: C++ CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: check build dependencies
+        run: |
+          gcc --version
+          cmake --version
+
+      - name: prepare cmake
+        run: |
+          mkdir build
+          cd build
+          cmake ../ \
+            -DV8_INCLUDE_DIR=$GITHUB_WORKSPACE/deps/include/ \
+            -DV8_MONOLITH_LIB_PATH=$GITHUB_WORKSPACE/deps/libv8_monolith.a \
+
+      - name: make
+        run: |
+          cd build
+          make
