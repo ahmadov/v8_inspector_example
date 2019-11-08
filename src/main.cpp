@@ -26,9 +26,10 @@ int main()
 
         inspector = std::unique_ptr<Inspector>(new Inspector(v8Platform, context, port));
 
-        // absolute or relative path of JavaScript source file to the executable
-        // V8 Inspector is very powerful, it has the source map support! You can debug your TypeScript code directly on ChromeDevTools!
-        inspector->addFileForInspection("../example/code.ts");
+        // Absolute or relative path of JavaScript source file to debug.
+        // V8 Inspector is very powerful, it has the source map support!
+        // The TypeScript source file has to be inline source mapped in the JavaScript file.
+        inspector->addFileForInspection("../example/code.js");
 
         inspector->startAgent();
     }

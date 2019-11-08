@@ -13,4 +13,10 @@ function main() {
     console.log(`${a} * ${b} = ${c}`);
 }
 
+const sayHi = (name: string) => {
+    console.log(`Hi, ${name}`);
+};
+
 main();
+
+sayHi('Foo');
