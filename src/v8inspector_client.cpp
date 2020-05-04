@@ -45,10 +45,6 @@ void V8InspectorClientImpl::schedulePauseOnNextStatement(const v8_inspector::Str
     session_->schedulePauseOnNextStatement(reason, reason);
 }
 
-int V8InspectorClientImpl::isWaitFrontendMessageMessageOnPause() {
-    return !terminated_;
-}
-
 void V8InspectorClientImpl::waitFrontendMessageOnPause() {
     terminated_ = false;
 }

@@ -20,8 +20,6 @@ public:
 
   void schedulePauseOnNextStatement(const v8_inspector::StringView &reason);
 
-  int isWaitFrontendMessageMessageOnPause();
-
   void waitFrontendMessageOnPause();
 private:
   v8::Local<v8::Context> ensureDefaultContextInGroup(int contextGroupId) override;

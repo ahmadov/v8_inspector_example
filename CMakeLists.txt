@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project(v8_inspector_example LANGUAGES CXX)
 
-set(V8_INCLUDE_DIR "" CACHE PATH "Path to the V8 include dir.")
-set(V8_MONOLITH_LIB_PATH "" CACHE FILEPATH "Path to the compiled V8 monolith *.a library.")
+set(V8_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/deps/include/" PATH "Path to the V8 include dir.")
+set(V8_MONOLITH_LIB_PATH "${CMAKE_SOURCE_DIR}/deps/libv8_monolith.a" )
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,13 +17,13 @@ add_executable(v8_inspector_example ${SOURCE_FILES})
 include_directories(
         ${V8_INCLUDE_DIR}
 )
-add_library(v8_monolith STATIC IMPORTED)
 
+add_library(v8_monolith STATIC IMPORTED)
 set_target_properties(
         v8_monolith
         PROPERTIES
         IMPORTED_LOCATION
-        ${V8_MONOLITH_LIB_PATH}
+        "${V8_MONOLITH_LIB_PATH}"
 )
 
 target_link_libraries(v8_inspector_example v8_monolith)
