@@ -19,8 +19,10 @@ jobs:
           mkdir build
           cd build
           cmake ../ \
+            -DBOOST_ROOT=$BOOST_ROOT_1_72_0 \
+            -DBoost_ADDITIONAL_VERSIONS=1.72.0 \
             -DV8_INCLUDE_DIR=$GITHUB_WORKSPACE/deps/include/ \
-            -DV8_MONOLITH_LIB_PATH=$GITHUB_WORKSPACE/deps/libv8_monolith.a \
+            -DV8_MONOLITH_LIB_PATH=$GITHUB_WORKSPACE/deps/libv8_monolith.a
 
       - name: make
         run: |
