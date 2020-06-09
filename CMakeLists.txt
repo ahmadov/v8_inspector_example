@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.5)
 
 project(v8_inspector_example LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(V8_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/deps/include/" PATH "Path to the V8 include dir.")
 set(V8_MONOLITH_LIB_PATH "${CMAKE_SOURCE_DIR}/deps/libv8_monolith.a" )
 set(BOOST_BEAST_INCLUDE "${BOOST_ROOT}/include" PATH "Path to the Boost.Beast include dir." )
-
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 FILE(GLOB TARGET_H "${CMAKE_SOURCE_DIR}/src/*.h")
 FILE(GLOB TARGET_CPP "${CMAKE_SOURCE_DIR}/src/*.cpp")

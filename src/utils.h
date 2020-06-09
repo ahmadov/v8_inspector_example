@@ -13,7 +13,7 @@ static inline std::string convertToString(v8::Isolate* isolate, const v8_inspect
           ? v8::String::NewFromOneByte(isolate, reinterpret_cast<const uint8_t*>(stringView.characters8()), v8::NewStringType::kNormal, length)
           : v8::String::NewFromTwoByte(isolate, reinterpret_cast<const uint16_t*>(stringView.characters16()), v8::NewStringType::kNormal, length)
       ).ToLocalChecked();
-  v8::String::Utf8Value result(isolate, message->ToString(isolate));
+  v8::String::Utf8Value result(isolate, message);
   return *result;
 }
 
@@ -27,11 +27,11 @@ static inline v8::Local<v8::Object> parseJson(const v8::Local<v8::Context> &cont
     if (value_.IsEmpty()) {
         return v8::Local<v8::Object>();
     }
-    return value_.ToLocalChecked()->ToObject(context->GetIsolate());
+    return value_.ToLocalChecked()->ToObject(context).ToLocalChecked();
 }
 
 static inline std::string getPropertyFromJson(v8::Isolate* isolate, const v8::Local<v8::Object> &jsonObject, const std::string &propertyName) {
-    v8::Local<v8::Value> property = jsonObject->Get(v8::String::NewFromUtf8(isolate, propertyName.c_str(), v8::NewStringType::kNormal).ToLocalChecked());
+    v8::Local<v8::Value> property = jsonObject->Get(isolate->GetCurrentContext(), v8::String::NewFromUtf8(isolate, propertyName.c_str(), v8::NewStringType::kNormal).ToLocalChecked()).ToLocalChecked();
     v8::String::Utf8Value utf8Value(isolate, property);
     return *utf8Value;
 }
@@ -48,7 +48,7 @@ static std::string readFileContent(const std::string &filename) {
 
 static std::string getExceptionMessage(v8::Isolate* isolate, const v8::Local<v8::Value> &exception) {
     v8::Local<v8::Object> error = v8::Local<v8::Object>::Cast(exception);
-    v8::String::Utf8Value exceptionMessage(isolate, error->ToString(isolate));
+    v8::String::Utf8Value exceptionMessage(isolate, error);
     return *exceptionMessage;
 }
 

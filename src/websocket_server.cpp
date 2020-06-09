@@ -59,7 +59,7 @@ void WebSocketServer::startListening()
 
 void WebSocketServer::printListeningMessage() {
     std::cout << "WebSocket based Inspector Agent started" << std::endl;
-    std::cout << "Open the following link in your Chrome/Chromium browser: chrome-devtools://devtools/bundled/inspector.html?experiments=true&v8only=true&ws=127.0.0.1:" <<  port_ << std::endl;
+    std::cout << "Open the following link in your Chrome/Chromium browser: devtools://devtools/bundled/inspector.html?experiments=true&v8only=true&ws=127.0.0.1:" <<  port_ << std::endl;
 }
 
 void WebSocketServer::waitForFrontendMessageOnPause() {
