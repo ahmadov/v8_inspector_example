@@ -2,40 +2,46 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef INCLUDE_CPPGC_INTERNALS_H_
-#define INCLUDE_CPPGC_INTERNALS_H_
+#ifndef INCLUDE_CPPGC_INTERNAL_API_CONSTANTS_H_
+#define INCLUDE_CPPGC_INTERNAL_API_CONSTANTS_H_
 
 #include <stddef.h>
 #include <stdint.h>
 
-#include "include/v8config.h"
+#include "v8config.h"  // NOLINT(build/include_directory)
 
 namespace cppgc {
 namespace internal {
-
-// Pre-C++17 custom implementation of std::void_t.
-template <typename... Ts>
-struct make_void {
-  typedef void type;
-};
-template <typename... Ts>
-using void_t = typename make_void<Ts...>::type;
 
 // Embedders should not rely on this code!
 
 // Internal constants to avoid exposing internal types on the API surface.
 namespace api_constants {
+
+constexpr size_t kKB = 1024;
+constexpr size_t kMB = kKB * 1024;
+constexpr size_t kGB = kMB * 1024;
+
 // Offset of the uint16_t bitfield from the payload contaning the
 // in-construction bit. This is subtracted from the payload pointer to get
 // to the right bitfield.
 static constexpr size_t kFullyConstructedBitFieldOffsetFromPayload =
     2 * sizeof(uint16_t);
 // Mask for in-construction bit.
-static constexpr size_t kFullyConstructedBitMask = size_t{1};
+static constexpr uint16_t kFullyConstructedBitMask = uint16_t{1};
+
+static constexpr size_t kPageSize = size_t{1} << 17;
+
+static constexpr size_t kLargeObjectSizeThreshold = kPageSize / 2;
+
+#if defined(CPPGC_CAGED_HEAP)
+constexpr size_t kCagedHeapReservationSize = static_cast<size_t>(4) * kGB;
+constexpr size_t kCagedHeapReservationAlignment = kCagedHeapReservationSize;
+#endif
 
 }  // namespace api_constants
 
 }  // namespace internal
 }  // namespace cppgc
 
-#endif  // INCLUDE_CPPGC_INTERNALS_H_
+#endif  // INCLUDE_CPPGC_INTERNAL_API_CONSTANTS_H_

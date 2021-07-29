@@ -3,7 +3,7 @@
 This repository contains a very simple example how to use a standalone V8 Inspector (without Node.js) with ChromeDevTools.
 
 # Dependencies
-* V8 8.3.110.9
+* V8 9.2.230.20
 * Boost.Beast (for WebSocket communication between ChromeDevTools and V8 Inspector)
 
 # Building

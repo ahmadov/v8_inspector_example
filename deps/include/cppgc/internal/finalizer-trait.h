@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef INCLUDE_CPPGC_FINALIZER_TRAIT_H_
-#define INCLUDE_CPPGC_FINALIZER_TRAIT_H_
+#ifndef INCLUDE_CPPGC_INTERNAL_FINALIZER_TRAIT_H_
+#define INCLUDE_CPPGC_INTERNAL_FINALIZER_TRAIT_H_
 
 #include <type_traits>
 
-#include "include/cppgc/internals.h"
+#include "cppgc/type-traits.h"
 
 namespace cppgc {
 namespace internal {
@@ -87,4 +87,4 @@ constexpr FinalizationCallback FinalizerTrait<T>::kCallback;
 }  // namespace internal
 }  // namespace cppgc
 
-#endif  // INCLUDE_CPPGC_FINALIZER_TRAIT_H_
+#endif  // INCLUDE_CPPGC_INTERNAL_FINALIZER_TRAIT_H_
