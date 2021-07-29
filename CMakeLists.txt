@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(v8_inspector_example LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(V8_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/deps/include/" PATH "Path to the V8 include dir.")
@@ -31,3 +31,4 @@ set_target_properties(
 target_link_libraries(v8_inspector_example v8_monolith)
 target_link_libraries(v8_inspector_example pthread)
 target_link_libraries(v8_inspector_example stdc++fs)
+target_link_libraries(v8_inspector_example dl)

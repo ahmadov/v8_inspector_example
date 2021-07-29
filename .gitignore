@@ -71,5 +71,8 @@ Thumbs.db
 *.dll
 *.exe
 
+# CMake output
+Debug
+
 .idea
 !deps/libv8_monolith.a
